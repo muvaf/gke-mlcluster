@@ -1,0 +1,6 @@
+title: "ML Cluster"
+version: v0.0.1
+permissionScope: Cluster
+dependsOn:
+  - crd: '*.container.gcp.crossplane.io'
+  - crd: '*.gcp.crossplane.io'

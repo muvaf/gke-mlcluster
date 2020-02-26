@@ -1,0 +1,10 @@
+nameReference:
+  - kind: GKECluster
+    fieldSpecs:
+      - path: spec/forProvider/clusterRef/name
+        kind: NodePool
+varReference:
+  - kind: NodePool
+    path: spec/providerRef/name
+  - kind: NodePool
+    path: spec/forProvider/locations

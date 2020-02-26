@@ -1,0 +1,14 @@
+resources:
+  - cluster.yaml
+
+configurations:
+  - kustomizeconfig.yaml
+
+vars:
+  - name: PROVIDER_NAME
+    objref:
+      kind: GKECluster
+      apiVersion: container.gcp.crossplane.io/v1beta1
+      name: cluster
+    fieldref:
+      fieldpath: spec.providerRef.name

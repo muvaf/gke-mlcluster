@@ -1,0 +1,62 @@
+---
+apiVersion: container.gcp.crossplane.io/v1beta1
+kind: GKECluster
+metadata:
+  name: cluster
+spec:
+  forProvider:
+    locations:
+      - us-central1
+  # if the parent resource is namespace-scoped, it can use its namespace.
+  # otherwise, we can possibly take that as parameter, too.
+  writeConnectionSecretsToNamespace: crossplane-system
+  providerRef:
+    name: gcp-provider
+  reclaimPolicy: Delete
+---
+apiVersion: container.gcp.crossplane.io/v1alpha1
+kind: NodePool
+metadata:
+  name: gpu-nodepool
+spec:
+  forProvider:
+    clusterRef:
+      name: cluster
+    autoscaling:
+      enabled: true
+      maxNodeCount: 1
+      minNodeCount: 1
+    initialNodeCount: 1
+    locations:
+      - us-central1-a
+    config:
+      diskSizeGb: 20
+      machineType: n1-standard-1
+      accelerators:
+        - acceleratorType: nvidia-tesla-p4
+          acceleratorCount: 1
+  providerRef:
+    name: $(PROVIDER_NAME)
+  reclaimPolicy: Delete
+---
+apiVersion: container.gcp.crossplane.io/v1alpha1
+kind: NodePool
+metadata:
+  name: cpu-nodepool
+spec:
+  forProvider:
+    locations:
+      - us-central1-a
+    clusterRef:
+      name: cluster
+    autoscaling:
+      enabled: true
+      maxNodeCount: 1
+      minNodeCount: 1
+    initialNodeCount: 1
+    config:
+      diskSizeGb: 20
+      machineType: n1-standard-16
+  providerRef:
+    name: $(PROVIDER_NAME)
+  reclaimPolicy: Delete

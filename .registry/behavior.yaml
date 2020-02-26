@@ -1,0 +1,41 @@
+source:
+  image: muvaf/gke-mlcluster:v0.0.1
+  path: "kustomize"
+crd:
+  # able to aim for an existing CRD?
+  kind: MLCluster
+  apiVersion: gcp.resourcepacks.crossplane.io/v1alpha1
+engine:
+  type: kustomize
+  kustomize:
+    overlays:
+      - apiVersion: container.gcp.crossplane.io/v1beta1
+        kind: GKECluster
+        name: cluster
+        bindings:
+          - from: "spec.providerRef"
+            to: "spec.providerRef"
+          - from: "spec.locations"
+            to: "spec.forProvider.locations"
+      - apiVersion: container.gcp.crossplane.io/v1alpha1
+        kind: NodePool
+        name: gpu-nodepool
+        # you are constrained with the structure of the underlying object.
+        # for example you cannot aim for accelerators[1].type in the underlying object.
+        bindings:
+          - from: "spec.locations"
+            to: "spec.forProvider.locations"
+          - from: "spec.gpuDiskSizeGb"
+            to: "spec.forProvider.config.diskSizeGb"
+          - from: "spec.gpuAccelerators"
+            to: "spec.forProvider.config.accelerators"
+      - apiVersion: container.gcp.crossplane.io/v1alpha1
+        kind: NodePool
+        name: cpu-nodepool
+        bindings:
+          - from: "spec.locations"
+            to: "spec.forProvider.locations"
+          - from: "spec.cpuDiskSizeGb"
+            to: "spec.forProvider.config.diskSizeGb"
+          - from: "spec.cpuMachineType"
+            to: "spec.forProvider.config.machineType"
